@@ -1,0 +1,101 @@
+---
+title: "p8105_hw3_rw2708"
+author: "Ran Wang"
+date: "10/7/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(ggridges)
+library(patchwork)
+library(p8105.datasets)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_bw() + theme(legend.position = "bottom"))
+```
+
+#Problem 1
+```{r instacart}
+data("instacart") 
+instacart <- instacart %>% 
+ select(user_id, order_id, order_number, product_id, product_name, order_dow, everything())
+
+```
+Description: the dataset contains the online grocery purchase information for instacart. The dataset has `r nrow(instacart)` of observations and `r ncol(instacart)` of variables. The key variables in this dataset are `r colnames(instacart)[1:2]` that identify each customer and their order id, `r colnames(instacart)[3:5]` indicate the quantity and name of products that each customer purchased. For example,
+
+
+```{r instacart}
+ count_aisle <- instacart %>%
+  arrange(aisle_id,aisle) %>% 
+  group_by(aisle_id,aisle) %>% 
+  count(aisle, name = "count_aisle",sort = TRUE)
+```
+There are `r nrow(count_aisle)` aisles and the `r count_aisle[1,2]` are the are the most items ordered from. 
+
+
+```{r plot_aisle}
+plot_aisle <- count_aisle %>% 
+  filter(count_aisle >= 10000) %>% 
+   ggplot(aes(x = aisle, y = count_aisle)) + 
+  geom_point(aes(color = count_aisle)) +
+   labs(title = "aisle plot",x = "aisle id", y = "counts of aisle")
+
+plot_aisle
+```
+
+```{r question3}
+table_1 =  
+  instacart %>% 
+  arrange(aisle_id, aisle) %>% 
+  filter(aisle == "baking ingredients" | aisle == "dog food care" | aisle == "packaged vegetables fruits") %>% 
+  group_by(aisle,product_name) %>% 
+  summarize(count = n()) %>% 
+  mutate(pop_rank=dense_rank(desc(count))) %>% 
+           filter(pop_rank < 4) %>% 
+  arrange(pop_rank) %>% 
+  pivot_wider(
+  names_from = "pop_rank", 
+  values_from = c("product_name", "count")) %>% 
+  rename("Rank_1"=product_name_1,"Rank_2"=product_name_2,"Rank_3"=product_name_3,"times_rank1"=count_1,"times_rank2"=count_2,"times_rank3"=count_3) %>% 
+  knitr::kable(digits = 1)
+  
+```
+
+```{r question4}
+table_2 =  
+  instacart %>% 
+  arrange(product_name,order_hour_of_day,order_dow) %>% 
+  filter(product_name=="Pink Lady Apples"| product_name =="Coffee Ice Cream") %>% 
+  group_by(product_name,order_dow) %>% 
+  summarize(mean_day=mean(order_hour_of_day)) %>% 
+  pivot_wider(
+    id_cols = "order_dow",
+  names_from = "product_name", 
+  values_from = "mean_day")%>% 
+  rename("Day of Week"=order_dow) %>% 
+  knitr::kable(digits = 1)
+  
+```
+
+#Problem 2
+```{r BRFSS}
+library(p8105.datasets)
+ 
+
+
+
+```
+
+
+
+  
+
+
