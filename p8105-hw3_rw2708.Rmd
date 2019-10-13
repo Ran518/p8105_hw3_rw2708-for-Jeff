@@ -253,7 +253,7 @@ The variables `r colnames(P3_data)[6] indicates whether the day is a weekday or 
 analysis_activity = P3_data %>% 
   group_by(week,day_id) %>% 
   summarise(total_activity = sum(activity_counts))
- 
+
  knitr::kable(analysis_activity,digits = 2)
 
 
@@ -266,11 +266,17 @@ trend_activity = analysis_activity %>%
   mutate(day = day_id) %>% 
   ggplot(aes(x = day, y = total_activity)) +
   geom_point(aes(color = day), alpha = 0.5) +
-  geom_line(aes(color = day))
-  
+  geom_line(aes(color = day)) +
+  scale_y_continuous(
+    # alteration for y-axis labels
+    breaks = c(0, 200000, 400000, 600000),
+    labels = c("0", "200000", "400000", "600000")
+  ) 
+
 
 trend_activity
 ```
+
 There is no clear trend of a total activity variable for each day since the total activity fluctuate greatly across the day.
 
 ```{r P3_question3}
