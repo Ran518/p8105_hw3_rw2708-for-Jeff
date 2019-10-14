@@ -10,7 +10,6 @@ knitr::opts_chunk$set(echo = TRUE)
 set.seed(123)
 library(tidyverse)
 library(viridis)
-library(dplyr)
 library(ggridges)
 library(patchwork)
 library(p8105.datasets)
@@ -61,7 +60,7 @@ There are `r nrow(count_aisle)` aisles and the `r count_aisle[1,1]` are the are 
 ```{r plot_aisle}
 #generate the dataframe for plotting
 plot_aisle = count_aisle %>% 
-  filter(count_aisle >= 10000) %>% 
+  filter(count_aisle > 10000) %>% 
   arrange(count_aisle) %>% 
   #change the order level of aisle according to the value of count_aisle 
   mutate(aisle = forcats::fct_reorder(aisle, count_aisle)) %>% 
@@ -203,7 +202,7 @@ data_penal <- brfss_clean %>%
   #make a density plot for distribution of data_value for responses in NY fro 2006 and 2010
   group_by(response) %>% 
   ggplot(aes(x = data_value, fill = response)) + 
-  geom_density(alpha = .5, adjust = .5, color = "blue") +
+  geom_density(alpha = .5, adjust=1, color = "blue") +
   facet_grid(year~response) +
    labs(
     title = "Two-Panel Plot of Data Value for Responses in NY State (2006 and 2010)",
@@ -260,9 +259,6 @@ analysis_activity = P3_data %>%
 
 #exploring the trend
 trend_activity = analysis_activity %>% 
-  #ggplot(aes(x = day_id, y = total_activity)) +
-  #geom_col(aes(fill = day_id)) +
-   #labs(title = " Trend for Total Activity Over the Day ", x = "Day",  y = "Total Activity") 
   mutate(day = day_id) %>% 
   ggplot(aes(x = day, y = total_activity)) +
   geom_point(aes(color = day), alpha = 0.5) +
