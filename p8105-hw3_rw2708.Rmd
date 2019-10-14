@@ -249,20 +249,21 @@ The variables `r colnames(P3_data)[6] indicates whether the day is a weekday or 
 
 ```{r P3_question2}
 # create a table showing a total activity variable for each day
-analysis_activity = P3_data %>% 
-  group_by(week,day_id) %>% 
-  summarise(total_activity = sum(activity_counts))
+  analysis_activity = P3_data %>% 
+  group_by(week,day) %>% 
+  mutate(total_activity = sum(activity_counts)) %>% 
+  select(-minute_daily,-activity_counts) %>% 
+  distinct()
+
 
  knitr::kable(analysis_activity,digits = 2)
 
 
-
 #exploring the trend
-trend_activity = analysis_activity %>% 
-  mutate(day = day_id) %>% 
-  ggplot(aes(x = day, y = total_activity)) +
-  geom_point(aes(color = day), alpha = 0.5) +
-  geom_line(aes(color = day)) +
+trend_activity = analysis_activity %>%  
+  ggplot(aes(x = day_id, y = total_activity)) +
+  geom_point(aes(color = day_id), alpha = 0.5) +
+  geom_line(aes(color = day_id)) +
   scale_y_continuous(
     # alteration for y-axis labels
     breaks = c(0, 200000, 400000, 600000),
@@ -281,12 +282,11 @@ day_week = P3_data  %>%
   mutate(minute_daily = as.numeric(minute_daily)) %>% 
   #converting day to a factor with different levels (might be good visually for plotting)
   mutate(day = forcats::fct_relevel(day, c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"))) %>% 
-  arrange(day) %>%
   #converting minute to hour
-  group_by(day) %>% 
+  group_by(week, day,day_id) %>% 
   mutate(hour_daily = ceiling(minute_daily/60)) %>% 
   # calculate the total activity for each hour in each day
-  group_by(day, hour_daily) %>% 
+  group_by(week, day, hour_daily,day_id) %>% 
   summarize(hour_activity = sum(activity_counts)) %>% 
   #Make a single-panel plot that shows the 24-hour activity time courses for each day
   ggplot(aes(x = hour_daily, y = hour_activity)) +
@@ -301,15 +301,15 @@ day_week = P3_data  %>%
     # alteration for x-axis labels 
     breaks = c(0, 4, 8, 12, 16, 20, 24),
     labels = c("0", "4", "8", "12", "16", "20", "24")) +
-   scale_y_continuous(
-    # alteration for y-axis labels
-    breaks = c(0, 50000, 100000, 150000, 200000, 250000, 300000),
-    labels = c("0", "50000", "100000", "150000", "200000","250000", "300000")
-  ) 
+    scale_y_continuous(
+    # make the y-axis labels a bit prettier
+    breaks = c(0, 20000, 40000, 60000, 80000, 100000, 120000),
+    labels = c("0", "20000", "40000", "60000", "80000", "100000", "120000")
+  )
 
 day_week
 ```
-As shown in the above graph, this man has similar of 24-hour activity pattern in every day of the week. For example, he has low activity during the 6am in a day. And his activity increases dramatically after approximately 6am of a day. His activity remains relatively stable between 6am and 20pm, then drops after 21pm. 
+As shown in the above graph, this man has similar of 24-hour activity pattern in each day of the week. For example, he has low activity during the 6am in a day. And his activity increases dramatically after approximately 6am of a day. His activity remains relatively stable between 6am and 20pm, then drops after 21pm. 
 
 
   
